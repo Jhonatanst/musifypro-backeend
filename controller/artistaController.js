@@ -1,4 +1,4 @@
-const bcrypt = require('bcrypt');  // Para hash de contraseñas
+const bcrypt = require('bcryptjs');  // Para hash de contraseñas
 const { enviarCorreo } = require('../config/mailer');  // Función de envío de correo
 const connection = require('../db/db');  // Conexión a la base de datos
 
