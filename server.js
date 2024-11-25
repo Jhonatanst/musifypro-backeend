@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const port = process.env.PORT || 30001;
+const port = process.env.DB_PORT || 3001;
 const connection = require('./db/db'); // Asegúrate de que esté apuntando al archivo de conexión
 // Importar las rutas
 const artistRoutes = require('./routes/artistasRoutes');
