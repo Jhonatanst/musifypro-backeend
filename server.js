@@ -1,9 +1,13 @@
 const express = require('express');
 const app = express();
-const port = 3000;
+const port = 3002;
 const connection = require('./db/db'); // Asegúrate de que esté apuntando al archivo de conexión
 // Importar las rutas
 const artistRoutes = require('./routes/artistasRoutes');
+
+
+const cors = require('cors');
+app.use(cors());
 
 // Middleware para procesar el cuerpo de la solicitud en formato JSON
 app.use(express.json());

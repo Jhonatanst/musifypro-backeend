@@ -70,6 +70,44 @@ exports.verifyCode = (req, res) => {
     });
 };
 
+const jwt = require('jsonwebtoken');
+
+
+// Ruta para el inicio de sesión
+exports.login = (req, res) => {
+    const { email, password } = req.body;
+
+    const query = 'SELECT * FROM usuarios WHERE email = ?';
+    connection.query(query, [email], async (err, results) => {
+        if (err || results.length === 0) {
+            return res.status(400).json({ message: 'Usuario o contraseña incorrectos' });
+        }
+
+        const user = results[0];
+
+        // Verificar que la contraseña coincida
+        const match = await bcrypt.compare(password, user.password);
+        if (!match) {
+            return res.status(400).json({ message: 'Usuario o contraseña incorrectos' });
+        }
+
+        // Generar un token JWT
+        const token = jwt.sign({ id: user.id, email: user.email, rol: user.rol }, process.env.JWT_SECRET, {
+            expiresIn: '1h'  // El token expirará en 1 hora
+        });
+
+        // Enviar el token al frontend
+        res.status(200).json({ message: 'Inicio de sesión exitoso', token });
+    });
+};
+
+
+
+
+
+
+
+
 
 
 // Esta es la única función uploadMusic que necesitas
@@ -83,22 +121,24 @@ exports.uploadMusic = (req, res) => {
         genero_secundario, 
         fecha_lanzamiento, // Asegúrate de capturar esto correctamente
         // ...otros campos
-        publicado_antes, 
+
         disquera, 
         lugar_grabacion, 
         codigo_upc, 
         titulo_cancion, 
         compositor, 
-        es_cover, 
+    
         hora_inicio_tiktok 
     } = req.body;
 
     const portada = req.files && req.files['portada'] ? req.files['portada'][0].path : null;
     const pista = req.files && req.files['pista'] ? req.files['pista'][0].path : null;
-// Convertir "si" a 1, y cualquier otro valor a 0
-const letra_explicita = (req.body.letra_explicita && req.body.letra_explicita.toLowerCase() === 'si') ? 1 : 0;
+    // Convertir "si" a 1, y cualquier otro valor a 0
+    const letra_explicita = (req.body.letra_explicita && req.body.letra_explicita.toLowerCase() === 'si') ? 1 : 0;
+    const es_cover = (req.body.es_cover && req.body.es_cover.toLowerCase() === 'si') ? 1 : 0;
+    const publicado_antes = (req.body.publicado_antes && req.body.publicado_antes.toLowerCase() === 'si') ? 1 : 0;
 
-    
+
     
     // Verifica que los campos se hayan recibido
     console.log(req.body);
@@ -111,7 +151,9 @@ const letra_explicita = (req.body.letra_explicita && req.body.letra_explicita.to
     if (!fecha_lanzamiento || !/^\d{4}-\d{2}-\d{2}$/.test(fecha_lanzamiento)) {
         return res.status(400).json({ message: 'Fecha de lanzamiento inválida o no proporcionada' });
     }
-    
+    // Convertir "si" a 1, y cualquier otro valor a 0
+
+
     const query = `
         INSERT INTO lanzamientos 
         (titulo_unico, nombre_artista, letra_explicita, idioma, genero_primario, genero_secundario, 
