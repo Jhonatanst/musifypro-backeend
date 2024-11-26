@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const port = process.env.DB_PORT || 3000; // Cambia a process.env.PORT si estás usando un puerto diferente para el servidor
+const port = process.env.PORT || 3000; // Cambia a process.env.PORT si estás usando un puerto diferente para el servidor
 const connection = require('./db/db'); // Asegúrate de que esté apuntando al archivo correcto
 const cors = require('cors');
 
