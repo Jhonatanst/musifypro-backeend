@@ -3,7 +3,7 @@ const router = express.Router();
 const artistaController = require("../controller/artistaController");
 const multer = require("multer");
 
-const bcrypt = require('bcryptjs');
+const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const connection = require('../db/db');  // Conexión a tu base de datos
 
