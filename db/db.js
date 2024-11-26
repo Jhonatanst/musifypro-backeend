@@ -14,7 +14,7 @@ const connection = mysql.createConnection({
 // Conectar a la base de datos
 connection.connect((err) => {
   if (err) {
-    console.error('Error al conectar con la base de datos: ' + err.stack);
+    res.send('<h1>¡Bienvenido a MusifyPro Backend!</h1>');
     return;s
   }
   console.log('Conectado a la base de datos como id ' + connection.threadId);
