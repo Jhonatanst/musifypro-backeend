@@ -129,10 +129,12 @@ exports.uploadMusic = (req, res) => {
         compositor, 
     
         hora_inicio_tiktok 
+        
     } = req.body;
 
-    const portada = req.files && req.files['portada'] ? req.files['portada'][0].path : null;
-    const pista = req.files && req.files['pista'] ? req.files['pista'][0].path : null;
+    const portada = req.files['portada'] ? req.files['portada'][0].path : null;
+    const pista = req.files['pista'] ? req.files['pista'][0].path : null;
+    
     // Convertir "si" a 1, y cualquier otro valor a 0
     const letra_explicita = (req.body.letra_explicita && req.body.letra_explicita.toLowerCase() === 'si') ? 1 : 0;
     const es_cover = (req.body.es_cover && req.body.es_cover.toLowerCase() === 'si') ? 1 : 0;
