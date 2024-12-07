@@ -9,10 +9,12 @@ const connection = require('../db/db');  // Conexión a tu base de datos
 
 
 // Ruta de inicio de sesión
+// Ruta de inicio de sesión
+// Inicio de sesión
 router.post('/login', (req, res) => {
     const { email, password } = req.body;
 
-    // Buscar al usuario en la base de datos
+    // Buscar al usuario por email
     const query = 'SELECT * FROM usuarios WHERE email = ?';
     connection.query(query, [email], async (err, results) => {
         if (err || results.length === 0) {
@@ -21,13 +23,18 @@ router.post('/login', (req, res) => {
 
         const user = results[0];
 
+        // Verificar si el usuario está verificado
+        if (user.verification_code !== null) {
+            return res.status(403).json({ message: 'Debes verificar tu cuenta antes de iniciar sesión.' });
+        }
+
         // Verificar la contraseña
         const validPassword = await bcrypt.compare(password, user.password);
         if (!validPassword) {
             return res.status(400).json({ message: 'Correo o contraseña incorrectos' });
         }
 
-        // Si la contraseña es válida, generar el token
+        // Si la contraseña es válida y el usuario está verificado, generar el token
         const token = jwt.sign(
             { userId: user.id, name: user.name, email: user.email },  // Datos del usuario
             process.env.JWT_SECRET,  // Clave secreta
@@ -38,6 +45,7 @@ router.post('/login', (req, res) => {
         res.json({ message: 'Inicio de sesión exitoso', token });
     });
 });
+
 
 
 
@@ -109,7 +117,36 @@ router.post('/upload', upload.fields([{ name: 'portada', maxCount: 1 }, { name: 
 
 
 // Ruta para verificar el código de confirmación
-router.post('/verify', artistaController.verifyCode);
+// Verificación de cuenta
+router.post('/verify', (req, res) => {
+    const { email, code } = req.body;
+
+    // Buscar al usuario por email
+    const query = 'SELECT * FROM usuarios WHERE email = ?';
+    connection.query(query, [email], (err, results) => {
+        if (err || results.length === 0) {
+            return res.status(400).json({ message: 'Usuario no encontrado.' });
+        }
+
+        const user = results[0];
+
+        // Verificar si el código coincide
+        if (user.verification_code !== code) {
+            return res.status(400).json({ message: 'Código de verificación incorrecto.' });
+        }
+
+        // Si el código es correcto, actualizar verification_code a NULL
+        const updateQuery = 'UPDATE usuarios SET verification_code = NULL WHERE email = ?';
+        connection.query(updateQuery, [email], (updateErr) => {
+            if (updateErr) {
+                return res.status(500).json({ message: 'Error al verificar la cuenta.' });
+            }
+
+            res.json({ message: 'Cuenta verificada con éxito.' });
+        });
+    });
+});
+
 
 // Ruta para registrar un artista
 router.post("/register", artistaController.register);
