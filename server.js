@@ -1,27 +1,28 @@
 const express = require('express');
 const app = express();
-const port = process.env.PORT || 3000; // Cambia a process.env.PORT si estás usando un puerto diferente para el servidor
-const connection = require('./db/db'); // Asegúrate de que esté apuntando al archivo correcto
+const port = process.env.PORT || 3000;
 const cors = require('cors');
 
-// Importar las rutas
+// Conexión a la base de datos
+require('./db/db');
+
+// Importar rutas
 const artistRoutes = require('./routes/artistasRoutes');
 
-// Configuración de CORS
+// Configuración de middlewares
 app.use(cors());
-
-// Middleware para procesar el cuerpo de la solicitud en formato JSON
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Usar las rutas de artista
+// Usar rutas
 app.use('/artist', artistRoutes);
 
-// Endpoint de bienvenida en la raíz
+// Endpoint de bienvenida
 app.get('/', (req, res) => {
   res.send(`
     <h1>¡Bienvenido a MusifyPro Backend!</h1>
-    <p>La API está funcionando correctamente.</p>
-    <p>Visita <strong>/artist</strong> para explorar las rutas de artistas.</p>
+    <p>API funcionando correctamente.</p>
+    <p>Visita <strong>/artist</strong> para explorar las rutas.</p>
   `);
 });
 
@@ -29,3 +30,7 @@ app.get('/', (req, res) => {
 app.listen(port, () => {
   console.log(`Servidor escuchando en http://localhost:${port}`);
 });
+
+
+
+
